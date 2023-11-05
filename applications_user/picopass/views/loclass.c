@@ -1,6 +1,5 @@
 #include "loclass.h"
-
-#include <picopass_device.h>
+#include "../picopass_worker_i.h"
 
 #include <gui/elements.h>
 
@@ -21,10 +20,6 @@ static void loclass_draw_callback(Canvas* canvas, void* model) {
     char draw_str[32] = {};
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str_aligned(canvas, 64, 0, AlignCenter, AlignTop, furi_string_get_cstr(m->header));
-
-    if(m->num_macs == 255) {
-        return;
-    }
 
     float progress = m->num_macs == 0 ? 0 :
                                         (float)(m->num_macs) / (float)(LOCLASS_MACS_TO_COLLECT);

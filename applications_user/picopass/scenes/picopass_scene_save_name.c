@@ -16,8 +16,7 @@ void picopass_scene_save_name_on_enter(void* context) {
     TextInput* text_input = picopass->text_input;
     bool dev_name_empty = false;
     if(!strcmp(picopass->dev->dev_name, "")) {
-        name_generator_make_auto(
-            picopass->text_store, sizeof(picopass->text_store), PICOPASS_APP_FILE_PREFIX);
+        name_generator_make_random(picopass->text_store, sizeof(picopass->text_store));
         dev_name_empty = true;
     } else {
         picopass_text_store_set(picopass, picopass->dev->dev_name);

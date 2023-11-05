@@ -5,8 +5,8 @@
 
 #define RX_BUF_SIZE 1024
 
-static const int gps_baudrates[6] = {4800, 9600, 19200, 38400, 57600, 115200};
-static int current_gps_baudrate = 1;
+static const int gps_baudrates[5] = {9600, 19200, 38400, 57600, 115200};
+static int current_gps_baudrate = 3;
 
 typedef struct {
     bool valid;
@@ -23,8 +23,6 @@ typedef struct {
     int time_seconds;
 } GpsStatus;
 
-typedef enum { KNOTS, KPH, MPH, INVALID } SpeedUnit;
-
 typedef struct {
     FuriMutex* mutex;
     FuriThread* thread;
@@ -35,7 +33,7 @@ typedef struct {
     uint32_t baudrate;
     bool changing_baudrate;
     bool backlight_on;
-    SpeedUnit speed_units;
+    bool speed_in_kms;
 
     GpsStatus status;
 } GpsUart;
