@@ -1,5 +1,5 @@
 App(
-    appid="hid_usb2",
+    appid="hid_usb",
     name="USB Keyboard & Mouse",
     apptype=FlipperAppType.EXTERNAL,
     entry_point="hid_usb_app",
@@ -12,7 +12,7 @@ App(
 
 
 App(
-    appid="hid_ble2",
+    appid="hid_ble",
     name="Bluetooth Remote",
     apptype=FlipperAppType.EXTERNAL,
     entry_point="hid_ble_app",

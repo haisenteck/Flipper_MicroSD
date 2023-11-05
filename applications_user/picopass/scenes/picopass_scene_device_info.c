@@ -17,6 +17,7 @@ void picopass_scene_device_info_on_enter(void* context) {
     FuriString* csn_str = furi_string_alloc_set("CSN:");
     FuriString* credential_str = furi_string_alloc();
     FuriString* wiegand_str = furi_string_alloc();
+    FuriString* sio_str = furi_string_alloc();
 
     dolphin_deed(DolphinDeedNfcReadSuccess);
 
@@ -25,29 +26,35 @@ void picopass_scene_device_info_on_enter(void* context) {
     PicopassPacs* pacs = &picopass->dev->dev_data.pacs;
     Widget* widget = picopass->widget;
 
-    uint8_t csn[PICOPASS_BLOCK_LEN] = {0};
-    memcpy(csn, AA1[PICOPASS_CSN_BLOCK_INDEX].data, PICOPASS_BLOCK_LEN);
-    for(uint8_t i = 0; i < PICOPASS_BLOCK_LEN; i++) {
+    uint8_t csn[RFAL_PICOPASS_BLOCK_LEN] = {0};
+    memcpy(csn, AA1[PICOPASS_CSN_BLOCK_INDEX].data, RFAL_PICOPASS_BLOCK_LEN);
+    for(uint8_t i = 0; i < RFAL_PICOPASS_BLOCK_LEN; i++) {
         furi_string_cat_printf(csn_str, "%02X ", csn[i]);
     }
 
-    if(pacs->bitLength == 0 || pacs->bitLength == 255) {
+    if(pacs->record.bitLength == 0 || pacs->record.bitLength == 255) {
         // Neither of these are valid.  Indicates the block was all 0x00 or all 0xff
         furi_string_cat_printf(wiegand_str, "Invalid PACS");
     } else {
-        size_t bytesLength = pacs->bitLength / 8;
-        if(pacs->bitLength % 8 > 0) {
+        size_t bytesLength = pacs->record.bitLength / 8;
+        if(pacs->record.bitLength % 8 > 0) {
             // Add extra byte if there are bits remaining
             bytesLength++;
         }
         furi_string_set(credential_str, "");
-        for(uint8_t i = PICOPASS_BLOCK_LEN - bytesLength; i < PICOPASS_BLOCK_LEN; i++) {
-            furi_string_cat_printf(credential_str, "%02X", pacs->credential[i]);
+        for(uint8_t i = RFAL_PICOPASS_BLOCK_LEN - bytesLength; i < RFAL_PICOPASS_BLOCK_LEN; i++) {
+            furi_string_cat_printf(credential_str, " %02X", pacs->credential[i]);
         }
-        furi_string_cat_printf(wiegand_str, "%d bits", pacs->bitLength);
+
+        if(pacs->record.valid) {
+            furi_string_cat_printf(
+                wiegand_str, "FC: %u CN: %u", pacs->record.FacilityCode, pacs->record.CardNumber);
+        } else {
+            furi_string_cat_printf(wiegand_str, "%d bits", pacs->record.bitLength);
+        }
 
         if(pacs->sio) {
-            furi_string_cat_printf(credential_str, " +SIO");
+            furi_string_cat_printf(sio_str, "+SIO");
         }
     }
 
@@ -63,10 +70,13 @@ void picopass_scene_device_info_on_enter(void* context) {
         AlignCenter,
         FontSecondary,
         furi_string_get_cstr(credential_str));
+    widget_add_string_element(
+        widget, 64, 46, AlignCenter, AlignCenter, FontSecondary, furi_string_get_cstr(sio_str));
 
     furi_string_free(csn_str);
     furi_string_free(credential_str);
     furi_string_free(wiegand_str);
+    furi_string_free(sio_str);
 
     widget_add_button_element(
         picopass->widget,

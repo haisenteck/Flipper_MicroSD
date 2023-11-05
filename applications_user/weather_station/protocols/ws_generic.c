@@ -149,7 +149,8 @@ SubGhzProtocolStatus ws_block_generic_serialize(
     return res;
 }
 
-SubGhzProtocolStatus ws_block_generic_deserialize(WSBlockGeneric* instance, FlipperFormat* flipper_format) {
+SubGhzProtocolStatus
+    ws_block_generic_deserialize(WSBlockGeneric* instance, FlipperFormat* flipper_format) {
     furi_assert(instance);
     SubGhzProtocolStatus res = SubGhzProtocolStatusError;
     uint32_t temp_data = 0;
